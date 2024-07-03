@@ -41,7 +41,7 @@ function extractTableData(ID) {
   for (let i = 0; i < table.length; i++) {
     data2.push(extractDataCell(table, i));
   }
-
+  console.log(data2);
   return data2.map((x) => x);
 }
 
@@ -441,11 +441,16 @@ select2Option.addEventListener("change", () => {
 
 /////////// api
 
-const urlApi = "https://canvasjs.com/services/data/datapoints.php";
+const urlApi = "https://canvasjs.com/services/data/datapoints.php?";
 let objectApi = [];
 
+let noCache = Date.now().toString(16);
+// urlApi = `${urlApi}${noCache}`;
+
 async function getApiData(url) {
-  fetch(url)
+  fetch(url, {
+    cache: "no-store", // Indique au navigateur de ne pas utiliser le cache pour avoir accès aux données aléatoires
+  })
     .then((Response) => {
       return Response.json();
     })
@@ -512,9 +517,12 @@ getApiData(urlApi);
 
 async function getApiDataTime(url) {
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      cache: "no-store", // Indique au navigateur de ne pas utiliser le cache pour avoir accès aux données aléatoires
+    });
     const json = await response.json();
     createObjectApi(json);
+    console.log(json);
     createGraphApiTime();
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -559,4 +567,8 @@ function createGraphApiTime() {
   containerTable3.append(plot3);
 }
 
-setInterval(() => getApiDataTime(urlApi), 1000);
+function updateSecond() {
+  setInterval(() => getApiDataTime(urlApi), 1000);
+}
+
+updateSecond();
